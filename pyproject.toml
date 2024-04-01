@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "01_WoWLogs"
+version = "0.1.0"
+description = ""
+authors = ["Kikidora"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11.2"
+pandas = "^2.2.1"
+openpyxl = "^3.1.2"
+numpy = "^1.26.4"
+seaborn = "^0.13.2"
+matplotlib = "^3.8.3"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
