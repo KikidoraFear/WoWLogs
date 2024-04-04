@@ -1,10 +1,12 @@
 bosses = [
     # Ahn'Qiraj
-    "Arygos", "Battleguard Sartura", "C'Thun", "Emperor Vek'lor", "Emperor Vek'nilash", "Eye of C'Thun", "Fankriss the Unyielding", "Lord Kri",
-        "Merithra of the Dream", "Ouro", "Princess Huhuran", "Princess Yauj", "The Master's Eye", "The Prophet Skeram", "Vem", "Viscidus",
+    "Arygos", "Battleguard Sartura", "C'Thun", "Emperor Vek'lor", "Emperor Vek'nilash", "Eye of C'Thun", "Fankriss the Unyielding", 
+        "Merithra of the Dream", "Ouro", "Princess Huhuran", "The Master's Eye", "The Prophet Skeram", "Viscidus",
+        "Lord Kri", "Princess Yauj", "Vem"
     # Naxxramas
     "Anub'Rekhan", "Grand Widow Faerlina", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Noth the Plaguebringer", "Heigan the Unclean", "Loatheb",
-        "Instructor Razuvious", "Gothik the Harvester", "Sapphiron", "Kel'Thuzad", "Lady Blaumeux", #"Thane Korth'azz", "Highlord Mograine", "Sir Zeliek",
+        "Instructor Razuvious", "Gothik the Harvester", "Sapphiron", "Kel'Thuzad", "Lady Blaumeux", "Thane Korth'azz", "Highlord Mograine", "Sir Zeliek",
+        "Stalagg", "Feugen",
     # Zul'Gurub
     "High Priestess Jeklik", "High Priest Venoxis", "High Priestess Mar'li", "High Priest Thekal", "High Priestess Arlokk",
         "Hakkar", "Bloodlord Mandokir", "Jin'do the Hexxer", "Gahz'ranka",
@@ -13,6 +15,19 @@ bosses = [
     # Blackwing Lair
     "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt"
 ]
+
+bosses_translator = {
+    "Lord Kri": "Bug Trio",
+    "Princess Yauj": "Bug Trio",
+    "Vem": "Bug Trio",
+    "Emperor Vek'lor": "Twin Emperors",
+    "Emperor Vek'nilash": "Twin Emperors",
+    "Eye of C'Thun": "C'Thun",
+    "Lady Blaumeux": "Four Horsemen",
+    "Thane Korth'azz": "Four Horsemen",
+    "Highlord Mograine": "Four Horsemen",
+    "Sir Zeliek": "Four Horsemen"
+}
 
 def CalcStuff(list_log, t_cd_section):
     # Init
@@ -49,64 +64,17 @@ def CalcSections(line_log, inp):
 
     # sections (bosses)
     # -> sometimes boss is in logs without incombat (e.g. hunter's mark) -> no boss section
-    # ToDo: -> sometimes boss fight starts with boss being in the logs (Nefarian, Thaddius) -> boss section
+    # ToDo: -> sometimes boss fight starts without boss being in the logs (Nefarian, Thaddius) -> boss section
     if (line_log["source"] in bosses) and inp["incombat"]:
-        boss = line_log["source"]
-        if not boss in inp["attempt"]:
-            inp["attempt"][boss] = 1
-        inp["section"] = boss
+        inp["section"] = line_log["source"]
         inp["t_section"] = line_log["timestamp"]
     elif (line_log["target"] in bosses) and inp["incombat"]:
-        boss = line_log["target"]
-        if not boss in inp["attempt"]:
-            inp["attempt"][boss] = 1
-        inp["section"] = boss
+        inp["section"] = line_log["target"]
         inp["t_section"] = line_log["timestamp"]
     if (line_log["timestamp"] > inp["t_section"]+inp["t_cd_section"]) and not inp["incombat"]:
-        if inp["section"] in inp["attempt"]:
-            inp["attempt"][inp["section"]] += 1
         inp["section"] = ""
 
-    if inp["section"] in inp["attempt"]:
-        line_log["section"] = inp["section"] + " (" + str(inp["attempt"][inp["section"]]) + ")"
-    else:
-        line_log["attempt"] = inp["section"]
+    if inp["section"] in bosses_translator:
+        inp["section"] = bosses_translator[inp["section"]]
 
-
-# def CalcSections(df, t_cd_section):
-#     print("Calculate sections...")
-#     flg_combat = False
-#     flg_combat_t = 0
-#     flg_boss = False
-#     flg_boss_t = 0
-#     df_dict = df.to_dict()
-#     incombat = {}
-#     section = {}
-#     for idx in range(len(df)):
-#         if (idx%1000==0) or (idx==len(df)-1):
-#             print("Line", idx+1, "/", len(df), end="\r")
-#         if df.loc[idx, "subkind"] == "DAMAGE":
-#             flg_combat = True
-#             flg_combat_t = df.loc[idx, "timestamp"]
-#         if df.loc[idx, "source"] in bosses:
-#             boss = df.loc[idx, "source"]
-#             flg_boss = True
-#             flg_boss_t = df.loc[idx, "timestamp"]
-#         elif df.loc[idx, "target"] in bosses:
-#             boss = df.loc[idx, "target"]
-#             flg_boss = True
-#             flg_boss_t = df.loc[idx, "timestamp"]
-#         if df.loc[idx, "timestamp"] > flg_combat_t+t_cd_section:
-#             flg_combat = False
-#         if df.loc[idx, "timestamp"] > flg_boss_t+t_cd_section:
-#             flg_boss = False
-        # if flg_combat:
-        #     df.loc[idx, "incombat"] = True
-        # if flg_boss:
-        #     df.loc[idx, "section"] = boss
-
-    # 10 | DAMAGE
-    # 12 | HEAL
-    # 14 | DAMAGE
-    # 30 | HEAL
-    # 31 | DAMAGE
+    line_log["section"] = inp["section"]

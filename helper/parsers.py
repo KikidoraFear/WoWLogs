@@ -60,7 +60,7 @@ def ParseLine(line_mod, timestamp, patterns_base, data_source):
         "kind": "",
         "subkind": "",
         "eheal": [None],
-        "oheal": [None]        
+        "oheal": [None]
     }
     pattern_found = False
     for pattern_base in patterns_base:
@@ -95,7 +95,7 @@ def ParseCombatLog(data_source, line, patterns_base, dict_log): # add dict_line_
         dict_line = ParseLine(line_mod, timestamp, patterns_base, data_source)
         dict_log[line_mod] = dict_line
 
-def ParseKikilogs(data_source, string, dict_log, player_names):
+def ParseKikilogs(data_source, string, dict_log, players):
     re_result = re.search('Kikilogs_data_heal = "(.*)"\n', string)
     data_heal = re_result.group(1)
     lines = data_heal.split("$")
@@ -103,7 +103,7 @@ def ParseKikilogs(data_source, string, dict_log, player_names):
         if (idx%1000==0) or (idx==len(lines)-1):
             print("Parsing line "+str(idx+1)+"/"+str(len(lines)), end='\r')
         data_heal_list = line.split("#")
-        if len(data_heal_list) == 4:
+        if len(data_heal_list) == 4: # timestamp#line_mod#eheal#oheal
             timestamp = float(data_heal_list[0])
             line_mod = PrepareLine(data_heal_list[1], data_source)
             eheal = int(data_heal_list[2])
@@ -115,10 +115,37 @@ def ParseKikilogs(data_source, string, dict_log, player_names):
                 dict_log[line_mod]["eheal"].append(eheal)
                 dict_log[line_mod]["oheal"].append(oheal)
     print()
+    
+    # re_result = re.search('Kikilogs_data_combat = "(.*)"\n', string)
+    # data_combat = re_result.group(1)
+    # lines = data_combat.split("$")
+    # for idx, line in enumerate(lines):
+    #     if (idx%1000==0) or (idx==len(lines)-1):
+    #         print("Parsing line "+str(idx+1)+"/"+str(len(lines)), end='\r')
+    #     data_combat_list = line.split("#")
+    #     if len(data_combat_list) == 2: # timestamp#i/o -> i..in combat, o..out of combat
+    #         if not "COMBAT" in dict_log:
+    #             dict_log["COMBAT"] = {}
+    #             dict_log["COMBAT"]["data_source"] = []
+    #             dict_log["COMBAT"]["timestamp"] = []
+    #             dict_log["COMBAT"]["valid"] = []
+    #         else:
+    #             dict_log["COMBAT"]["data_source"].append(data_source)
+    #             dict_log["COMBAT"]["timestamp"].append(data_combat_list[0])
+    #             dict_log["COMBAT"]["valid"].append(True)
+    #         if data_combat_list[1]=="i":
+                
+    #         elif data_combat_list[1]=="o":
+
+
+
     re_result = re.search('Kikilogs_data_players = "(.*)"\n', string)
     data_players = re_result.group(1)
     lines = data_players.split("$")
     for idx, line in enumerate(lines):
         data_players_list = line.split("#")
-        if data_players_list[0]:
-            player_names.append(data_players_list[0])
+        player_name = data_players_list[0]
+        if player_name:
+            players[player_name] = {}
+            players[player_name]["class"] = data_players_list[1]
+            players[player_name]["pet"] = data_players_list[2]

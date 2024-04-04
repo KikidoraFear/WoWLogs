@@ -71,6 +71,8 @@ patterns_base = [
     ["SPELLFAILPERFORMOTHER", "%s fails to perform %s: %s.", ["source", "spell", "school"], "SPELL", "FAILPERFORM"],
     # EVADE
     ["SPELLEVADEDOTHEROTHER", "%s's %s was evaded by %s.", ["source", "spell", "target"], "SPELL", "EVADED"],
+    # REFLECT
+    ["SPELLREFLECTOTHEROTHER", "%s's %s is reflected back by %s.", ["source", "spell", "target"], "SPELL", "EVADED"],
 
     ##############
     # SPELLPOWER #
