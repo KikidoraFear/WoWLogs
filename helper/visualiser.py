@@ -1,6 +1,7 @@
 
 import pandas as pd
 import numpy as np
+import math
 # import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
@@ -60,7 +61,7 @@ def BarPlot_Damage(ax, df, players, val_col):
         if pet_name:
             idx = idx | ((df["source"]==pet_name) & (df["target"]!=pet_name))
         x_bar.append(source)
-        y_bar.append(df[idx][val_col].sum()) # damage to self shouldnt add to damage (warlock hellfire,...)
+        y_bar.append(df[idx][val_col].sum())
     idx_s = list(np.argsort(y_bar))
     x_bar = np.array(x_bar)
     y_bar = np.array(y_bar)
@@ -69,6 +70,7 @@ def BarPlot_Damage(ax, df, players, val_col):
     ax.barh(x_bar[idx_s], y_bar[idx_s], color=col[idx_s])
     for x_txt, y_txt in enumerate(y_bar[idx_s]):
         ax.text(y_txt, x_txt, "{:.0f}".format(y_txt), fontsize=FONT_SIZE, color=cols[x_txt], va="center")
+    ax.tick_params(labelbottom=False)
 
 def BarPlot_Heal(ax, df, players):
     x_bar = []
@@ -103,10 +105,73 @@ def BarPlot_Heal(ax, df, players):
     for x_txt, y_txt in enumerate(ys_bar_theal):
         ax.text(y_txt, x_txt, "{:.0f} (+{:.0f}/{:.0f})".format(ys_bar_eheal[x_txt], ys_bar_oheal[x_txt], ys_bar_theal_add[x_txt]),
                 fontsize=FONT_SIZE, color=cols[x_txt], va="center")
+    ax.tick_params(labelbottom=False)
+
+def BarPlots_Spells(fig, df, players, val_col, dmg):
+    players_amount = len(players)
+    rows = math.ceil(math.sqrt(players_amount))
+    cols = math.ceil(players_amount/rows)
+    gs = fig.add_gridspec(rows,cols)
+
+    for idx_player, source in enumerate(players):
+        row = math.floor(idx_player/cols)
+        col = idx_player%cols
+        ax = fig.add_subplot(gs[row, col])
+        class_col = class_colours[players[source]["class"]]
+        ax.set_title(source, color=class_col)
+        if dmg:
+            idx = (df["source"]==source) & (df["target"]!=source) # damage to self shouldnt add to damage (warlock hellfire,...)
+            pet_name = players[source]["pet"]
+            if pet_name:
+                idx = idx | ((df["source"]==pet_name) & (df["target"]!=pet_name))
+        else:
+            idx = (df["source"]==source)
+        df_player = df[idx]
+        spell_unique = df_player["spell"].unique()
+        x_bar = []
+        y_bar = []
+        for spell in spell_unique:
+            idx_spell = (df_player["spell"]==spell)
+            x_bar.append(spell)
+            y_bar.append(df_player[idx_spell][val_col].sum())
+        idx_s = list(np.argsort(y_bar))
+        x_bar = np.array(x_bar)
+        y_bar = np.array(y_bar)
+        top_spells_max = np.minimum(np.size(y_bar), 4)
+        idx_s4 = idx_s[-top_spells_max:]
+        ax.barh(x_bar[idx_s4], y_bar[idx_s4])
+        for x_txt, y_txt in enumerate(y_bar[idx_s4]):
+            ax.text(0, x_txt, "{:.0f}".format(y_txt), fontsize=FONT_SIZE, va="center", ha="left")
+        ax.tick_params(labelbottom=False)
+
+def GetPlayerHealDamage(df, players):
+    df_damage = df[df["subkind"]=="DAMAGE"]
+    df_heal = df[df["subkind"]=="HEAL"]
+    players_damage = {}
+    players_heal = {}
+    for source in players:
+        idx_damage = df_damage["source"]==source
+        idx_heal = df_heal["source"]==source
+        val_sum = df_damage[idx_damage]["value"].sum() + df_heal[idx_heal]["value"].sum()
+        if df_damage[idx_damage]["value"].sum()/val_sum*100 > 10: # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
+            players_damage[source] = {
+                "class": players[source]["class"],
+                "pet": players[source]["pet"]
+            }
+        if df_heal[idx_heal]["value"].sum()/val_sum*100 > 10: # if heal > x% of total values -> healer
+            players_heal[source] = {
+                "class": players[source]["class"],
+                "pet": players[source]["pet"]
+            }
+    return (players_damage, players_heal)
+    
 
 def Visualise(df, players):
     print("###### Use inbetween to plot boss sections (if boss fight is interrupted)")
-    pp = PdfPages('240401_AQ.pdf')
+
+    (players_damage, players_heal) = GetPlayerHealDamage(df, players)
+
+    pp = PdfPages('240404_Nax.pdf')
 
     px = 1/plt.rcParams['figure.dpi']  # pixel in inches
 
@@ -116,19 +181,31 @@ def Visualise(df, players):
     gs = fig.add_gridspec(2,2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax1.set_title('Damage')
-    LinePlot(ax1, df[df["subkind"]=="DAMAGE"], players, "value", True, True)
+    LinePlot(ax1, df[df["subkind"]=="DAMAGE"], players_damage, "value", True, True)
 
     ax2 = fig.add_subplot(gs[1, 0])
     ax2.set_title('effective healing')
-    LinePlot(ax2, df[df["subkind"]=="HEAL"], players, "eheal", False, True)
+    LinePlot(ax2, df[df["subkind"]=="HEAL"], players_heal, "eheal", False, True)
 
     ax3 = fig.add_subplot(gs[0, 1])
     ax3.set_title('Damage')
-    BarPlot_Damage(ax3, df[df["subkind"]=="DAMAGE"], players, "value")
+    BarPlot_Damage(ax3, df[df["subkind"]=="DAMAGE"], players_damage, "value")
 
     ax4 = fig.add_subplot(gs[1, 1])
     ax4.set_title('effective healing')
-    BarPlot_Heal(ax4, df[df["subkind"]=="HEAL"], players)
+    BarPlot_Heal(ax4, df[df["subkind"]=="HEAL"], players_heal)
+    plt.close()
+    pp.savefig(fig)
+
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: All (Damage)")
+    BarPlots_Spells(fig, df[df["subkind"]=="DAMAGE"], players_damage, "value", True)
+    plt.close()
+    pp.savefig(fig)
+
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: All (Healing)")
+    BarPlots_Spells(fig, df[df["subkind"]=="HEAL"], players_heal, "eheal", False)
     plt.close()
     pp.savefig(fig)
 
@@ -138,19 +215,31 @@ def Visualise(df, players):
     gs = fig.add_gridspec(2,2)
     ax1 = fig.add_subplot(gs[0, 0])
     ax1.set_title('Damage')
-    LinePlot(ax1, df[(df["subkind"]=="DAMAGE") & (df["section"]!="")], players, "value", True, True)
+    LinePlot(ax1, df[(df["subkind"]=="DAMAGE") & (df["section"]!="")], players_damage, "value", True, True)
 
     ax2 = fig.add_subplot(gs[1, 0])
     ax2.set_title('effective healing')
-    LinePlot(ax2, df[(df["subkind"]=="HEAL") & (df["section"]!="")], players, "eheal", False, True)
+    LinePlot(ax2, df[(df["subkind"]=="HEAL") & (df["section"]!="")], players_heal, "eheal", False, True)
 
     ax3 = fig.add_subplot(gs[0, 1])
     ax3.set_title('Damage')
-    BarPlot_Damage(ax3, df[(df["subkind"]=="DAMAGE") & (df["section"]!="")], players, "value")
+    BarPlot_Damage(ax3, df[(df["subkind"]=="DAMAGE") & (df["section"]!="")], players_damage, "value")
 
     ax4 = fig.add_subplot(gs[1, 1])
     ax4.set_title('effective healing')
-    BarPlot_Heal(ax4, df[(df["subkind"]=="HEAL") & (df["section"]!="")], players)
+    BarPlot_Heal(ax4, df[(df["subkind"]=="HEAL") & (df["section"]!="")], players_heal)
+    plt.close()
+    pp.savefig(fig)
+
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: Bosses (Damage)")
+    BarPlots_Spells(fig, df[(df["subkind"]=="DAMAGE") & (df["section"]!="")], players_damage, "value", True)
+    plt.close()
+    pp.savefig(fig)
+
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: Bosses (Healing)")
+    BarPlots_Spells(fig, df[(df["subkind"]=="HEAL") & (df["section"]!="")], players_heal, "eheal", False)
     plt.close()
     pp.savefig(fig)
 
@@ -164,19 +253,31 @@ def Visualise(df, players):
             gs = fig.add_gridspec(2,2)
             ax1 = fig.add_subplot(gs[0, 0])
             ax1.set_title('Damage')
-            LinePlot(ax1, df[(df["subkind"]=="DAMAGE") & (df["section"]==section)], players, "value", True, False)
+            LinePlot(ax1, df[(df["subkind"]=="DAMAGE") & (df["section"]==section)], players_damage, "value", True, False)
 
             ax2 = fig.add_subplot(gs[1, 0])
             ax2.set_title('effective healing')
-            LinePlot(ax2, df[(df["subkind"]=="HEAL") & (df["section"]==section)], players, "eheal", False, False)
+            LinePlot(ax2, df[(df["subkind"]=="HEAL") & (df["section"]==section)], players_heal, "eheal", False, False)
 
             ax3 = fig.add_subplot(gs[0, 1])
             ax3.set_title('Damage')
-            BarPlot_Damage(ax3, df[(df["subkind"]=="DAMAGE") & (df["section"]==section)], players, "value")
+            BarPlot_Damage(ax3, df[(df["subkind"]=="DAMAGE") & (df["section"]==section)], players_damage, "value")
 
             ax4 = fig.add_subplot(gs[1, 1])
             ax4.set_title('effective healing')
-            BarPlot_Heal(ax4, df[(df["subkind"]=="HEAL") & (df["section"]==section)], players)
+            BarPlot_Heal(ax4, df[(df["subkind"]=="HEAL") & (df["section"]==section)], players_heal)
+            plt.close()
+            pp.savefig(fig)
+
+            fig = plt.figure(figsize=(1920*px,1080*px))
+            fig.suptitle("Section: " + section +  " (Damage)")
+            BarPlots_Spells(fig, df[(df["subkind"]=="DAMAGE") & (df["section"]==section)], players_damage, "value", True)
+            plt.close()
+            pp.savefig(fig)
+
+            fig = plt.figure(figsize=(1920*px,1080*px))
+            fig.suptitle("Section: " + section +  " (Healing)")
+            BarPlots_Spells(fig, df[(df["subkind"]=="HEAL") & (df["section"]==section)], players_heal, "eheal", False)
             plt.close()
             pp.savefig(fig)
 

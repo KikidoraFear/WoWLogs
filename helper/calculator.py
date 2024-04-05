@@ -26,7 +26,9 @@ bosses_translator = {
     "Lady Blaumeux": "Four Horsemen",
     "Thane Korth'azz": "Four Horsemen",
     "Highlord Mograine": "Four Horsemen",
-    "Sir Zeliek": "Four Horsemen"
+    "Sir Zeliek": "Four Horsemen",
+    "Stalagg": "Stalagg and Feugen",
+    "Feugen": "Stalagg and Feugen"
 }
 
 def CalcStuff(list_log, t_cd_section):

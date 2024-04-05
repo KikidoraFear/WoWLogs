@@ -45,6 +45,7 @@ patterns_base = [
     # PERFORM
     ["SPELLPERFORMOTHERSTART", "%s begins to perform %s.", ["source", "spell"], "SPELL", "PERFORM"],
     ["SPELLTERSEPERFORM_OTHER", "%s performs %s.", ["source", "spell"], "SPELL", "PERFORM"],
+    ["SPELLPERFORMGOOTHER", "%s performs %s.", ["source", "spell"], "SPELL", "PERFORM"],
     # RESIST
     ["SPELLRESISTOTHEROTHER", "%s's %s was resisted by %s.", ["source", "spell", "target"], "SPELL", "RESIST"],
     ["SPELLRESISTOTHERSELF", "%s's %s was resisted.", ["source", "spell"], "SPELL", "RESISTED"],
@@ -54,6 +55,7 @@ patterns_base = [
     # PARRIED
     ["SPELLPARRIEDOTHEROTHER", "%s's %s was parried by %s.", ["source", "spell", "target"], "SPELL", "PARRIED"],
     ["SPELLPARRIEDOTHERSELF", "%s's %s was parried.", ["source", "spell"], "SPELL", "PARRIED"],
+    ["SPELLPARRIEDSELFOTHER", "%s's %s is parried by %s.", [], "SPELL", "PARRIED"], # MODIFIED "Your %s is parried by %s."
     # FAILCAST
     ["SPELLFAILCASTOTHER", "%s fails to cast %s: %s.", ["source", "spell", "school"], "SPELL", "FAILCAST"],
     # IMMUNE
