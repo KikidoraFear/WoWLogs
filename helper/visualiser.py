@@ -153,12 +153,12 @@ def GetPlayerHealDamage(df, players):
         idx_damage = df_damage["source"]==source
         idx_heal = df_heal["source"]==source
         val_sum = df_damage[idx_damage]["value"].sum() + df_heal[idx_heal]["value"].sum()
-        if df_damage[idx_damage]["value"].sum()/val_sum*100 > 10: # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
+        if (val_sum>0) and (df_damage[idx_damage]["value"].sum()/val_sum*100 > 10): # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
             players_damage[source] = {
                 "class": players[source]["class"],
                 "pet": players[source]["pet"]
             }
-        if df_heal[idx_heal]["value"].sum()/val_sum*100 > 10: # if heal > x% of total values -> healer
+        if (val_sum>0) and (df_heal[idx_heal]["value"].sum()/val_sum*100 > 10): # if heal > x% of total values -> healer
             players_heal[source] = {
                 "class": players[source]["class"],
                 "pet": players[source]["pet"]
@@ -171,7 +171,7 @@ def Visualise(df, players):
 
     (players_damage, players_heal) = GetPlayerHealDamage(df, players)
 
-    pp = PdfPages('240404_Nax.pdf')
+    pp = PdfPages('foo.pdf')
 
     px = 1/plt.rcParams['figure.dpi']  # pixel in inches
 

@@ -16,7 +16,7 @@ print("ToDo: Get Players and Hunter Pets from SavedVariables\n\
       Boss fight starts when fight starts\n\
       add incombat to SavedVariables")
 # folder = r"240330_MC"
-folder = r"240404_Nax"
+folder = r"240406_BWL"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 

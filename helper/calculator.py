@@ -13,7 +13,9 @@ bosses = [
     # The Molten Core
     "Baron Geddon", "Garr", "Gehennas", "Golemagg the Incinerator", "Lucifron", "Magmadar", "Shazzrah", "Sulfuron Harbinger", "Majordomo Executus", "Ragnaros",
     # Blackwing Lair
-    "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt"
+    "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt",
+    # ES
+    "Erennius", "Solnius"
 ]
 
 bosses_translator = {
