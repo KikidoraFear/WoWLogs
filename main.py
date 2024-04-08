@@ -12,11 +12,8 @@ from helper.syncer import *
 from helper.calculator import *
 from helper.visualiser import *
 
-print("ToDo: Get Players and Hunter Pets from SavedVariables\n\
-      Boss fight starts when fight starts\n\
-      add incombat to SavedVariables")
-# folder = r"240330_MC"
-folder = r"240406_BWL"
+print("ToDo: Boss fight starts when fight starts")
+folder = r"240404_Nax"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 
@@ -31,7 +28,6 @@ for filepath in filepaths:
     filename = Path(filepath).stem
     data_kind = filename.split("_")[0]
     data_source = filename.split("_")[1]
-    dungeon = filename.split("_")[2]
     file = open(filepath, 'r')
     lines = file.readlines()
     for idx, line in enumerate(lines):
@@ -50,7 +46,6 @@ for filepath in filepaths:
     filename = Path(filepath).stem
     data_kind = filename.split("_")[0]
     data_source = filename.split("_")[1]
-    dungeon = filename.split("_")[2]
     file = open(filepath, 'r')
     string = file.read()
     ParseKikilogs(data_source, string, dict_log, players)
@@ -60,26 +55,16 @@ for filepath in filepaths:
 # SYNC AND SORT LOGS #
 ######################
 list_log = SyncDictLogMaster(dict_log, t_delta_max)
-print("Sort list by timestamp...")
-list_log = sorted(list_log, key=lambda x: x["timestamp"])
-timestamp_0 = list_log[0]["timestamp"]
-for idx in range(len(list_log)):
-    list_log[idx]["timestamp"] -= timestamp_0
 
 ###################
 # CALCULATE STUFF #
 ###################
 CalcStuff(list_log, t_cd_section)
 
-
-###############
-# EXPORT DATA #
-###############
+###########################
+# VISUALISE & EXPORT DATA #
+###########################
 df = pd.DataFrame(list_log)
-# df["timestamp"] = df["timestamp"]-df.loc[0,"timestamp"]
-# print(df[df["source"]=="Kikidora"]["eheal"].sum())
-# print(df[(df["source"]=="Kikidora") & (df["section"]!="")]["eheal"].sum())
-# df.to_excel("Test2.xlsx")
-Visualise(df, players)
+Visualise(df, players, folder)
 
 # df[(df["subkind"]=="HEAL") ].to_excel("Test5.xlsx")

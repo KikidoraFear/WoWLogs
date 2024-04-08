@@ -58,6 +58,11 @@ def DictToList(dict_log):
                 dict_line["eheal"] = dict_log[line_mod]["eheal"][idx]
                 dict_line["oheal"] = dict_log[line_mod]["oheal"][idx]
                 list_log.append(dict_line)
+    print("Sort list by timestamp and remove offset...")
+    list_log = sorted(list_log, key=lambda x: x["timestamp"])
+    timestamp_0 = list_log[0]["timestamp"]
+    for idx in range(len(list_log)):
+        list_log[idx]["timestamp"] -= timestamp_0
     return list_log
 
 def SyncDictLogMaster(dict_log, t_delta_max):

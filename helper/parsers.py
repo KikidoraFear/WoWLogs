@@ -32,7 +32,7 @@ def PrepareLine(line, data_source):
 def ParseTimeStamp(line):
     pattern = r"(\d+)/(\d+) (\d+):(\d+):(\d+).(\d+)  (.*)"
     match = re.search(pattern, line)
-    year = 2024
+    year = datetime.datetime.now().year #2024
     month = int(match.group(1))
     day = int(match.group(2))
     hour = int(match.group(3))
@@ -116,29 +116,6 @@ def ParseKikilogs(data_source, string, dict_log, players):
                 dict_log[line_mod]["eheal"].append(eheal)
                 dict_log[line_mod]["oheal"].append(oheal)
     print()
-    
-    # re_result = re.search('Kikilogs_data_combat = "(.*)"\n', string)
-    # data_combat = re_result.group(1)
-    # lines = data_combat.split("$")
-    # for idx, line in enumerate(lines):
-    #     if (idx%1000==0) or (idx==len(lines)-1):
-    #         print("Parsing line "+str(idx+1)+"/"+str(len(lines)), end='\r')
-    #     data_combat_list = line.split("#")
-    #     if len(data_combat_list) == 2: # timestamp#i/o -> i..in combat, o..out of combat
-    #         if not "COMBAT" in dict_log:
-    #             dict_log["COMBAT"] = {}
-    #             dict_log["COMBAT"]["data_source"] = []
-    #             dict_log["COMBAT"]["timestamp"] = []
-    #             dict_log["COMBAT"]["valid"] = []
-    #         else:
-    #             dict_log["COMBAT"]["data_source"].append(data_source)
-    #             dict_log["COMBAT"]["timestamp"].append(data_combat_list[0])
-    #             dict_log["COMBAT"]["valid"].append(True)
-    #         if data_combat_list[1]=="i":
-                
-    #         elif data_combat_list[1]=="o":
-
-
 
     re_result = re.search('Kikilogs_data_players = "(.*)"\n', string)
     data_players = re_result.group(1)
