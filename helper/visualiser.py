@@ -87,7 +87,7 @@ def LinePlot(ax, df, subkind, section, players_sep):
                 ax.set_ylim(y_min, y_max) # ylim is changed when using fill_between -> set it back to previous values
         ax.legend(prop={'size': 6})
 
-def BarPlot(ax, df, subkind, section, players_sep):
+def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
     dff = df[df["subkind"]==subkind]
     if section == "All":
         dff = dff
@@ -101,7 +101,6 @@ def BarPlot(ax, df, subkind, section, players_sep):
     players = players_sep[subkind]
     x_bar = np.array([])
     y_bar = np.array([])
-    y_bar_oheal = np.array([])
     y_bar_tot = np.array([])
     bar_colors = np.array([])
     for source in players:
@@ -112,9 +111,11 @@ def BarPlot(ax, df, subkind, section, players_sep):
             if pet_name:
                 idx = idx | ((dff["source"]==pet_name) & (dff["target"]!=pet_name)) # add pet to damage
         elif subkind=="HEAL":
-            val_col = "eheal"
+            if oheal:
+                val_col = "oheal"
+            else:
+                val_col = "eheal"
             idx = (dff["source"]==source)
-            y_bar_oheal = np.append(y_bar_oheal, dff[idx]["oheal"].sum())
             y_bar_tot = np.append(y_bar_tot, dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum())
         x_bar = np.append(x_bar, source)
         y_bar = np.append(y_bar, dff[idx][val_col].sum())
@@ -125,7 +126,7 @@ def BarPlot(ax, df, subkind, section, players_sep):
         if subkind=="DAMAGE":
             ax.text(y_bar[idxs], x_bar[idxs], "{:.0f}".format(y_bar[idxs]), fontsize=FONT_SIZE, va="center")
         elif subkind=="HEAL":
-            ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} (+{:.0f}/{:.0f})".format(y_bar[idxs], y_bar_oheal[idxs], y_bar_tot[idxs]), fontsize=FONT_SIZE, va="center")
+            ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_tot[idxs]), fontsize=FONT_SIZE, va="center")
 
     ax.tick_params(labelbottom=False)
 
@@ -183,23 +184,27 @@ def GenSectionPlots(pp, df, players_sep, section):
 
     fig = plt.figure(figsize=(1920*px,1080*px))
     fig.suptitle("Section: " + section)
-    gs = fig.add_gridspec(2,2)
+    gs = fig.add_gridspec(4,2)
     # Damage Lines
-    ax1 = fig.add_subplot(gs[0, 0])
+    ax1 = fig.add_subplot(gs[0:2, 0])
     ax1.set_title('Damage')
     LinePlot(ax1, df, "DAMAGE", section, players_sep)
     # Heal Lines
-    ax2 = fig.add_subplot(gs[1, 0])
+    ax2 = fig.add_subplot(gs[2:4, 0])
     ax2.set_title('Effective Healing')
     LinePlot(ax2, df, "HEAL", section, players_sep)
     # Damage Bars
-    ax3 = fig.add_subplot(gs[0, 1])
+    ax3 = fig.add_subplot(gs[0:2, 1])
     ax3.set_title('Damage')
     BarPlot(ax3, df, "DAMAGE", section, players_sep)
-    # Heal Bars
-    ax4 = fig.add_subplot(gs[1, 1])
+    # eHeal Bars
+    ax4 = fig.add_subplot(gs[2, 1])
     ax4.set_title('Effective Healing')
     BarPlot(ax4, df, "HEAL", section, players_sep)
+    # oHeal Bars
+    ax5 = fig.add_subplot(gs[3, 1])
+    ax5.set_title('Over Healing')
+    BarPlot(ax5, df, "HEAL", section, players_sep, oheal=True)
     plt.close()
     pp.savefig(fig)
 
@@ -218,21 +223,23 @@ def GenSectionPlots(pp, df, players_sep, section):
    
 
 def Visualise(df, players, folder):
-    print("###### Use inbetween to plot boss sections (if boss fight is interrupted)")
-
     players_sep = GetPlayersSep(df, players)
     pp = PdfPages(folder + ".pdf")
 
     # SECTION: ALL
+    print("Plot Section: All")
     GenSectionPlots(pp, df, players_sep, "All")
 
     # SECTION: TRASH
+    print("Plot Section: Trash")
     GenSectionPlots(pp, df, players_sep, "Trash")
 
     # SECTION: BOSSES
+    print("Plot Section: Bosses")
     GenSectionPlots(pp, df, players_sep, "Bosses")
 
     # SECTION: BOSS
+    print("Plot Section: Boss")
     sections_unique = df["section"].unique()
     for section in sections_unique:
         if section: # dont show empty section

@@ -12,8 +12,7 @@ from helper.syncer import *
 from helper.calculator import *
 from helper.visualiser import *
 
-print("ToDo: Boss fight starts when fight starts")
-folder = r"240404_Nax"
+folder = r"Logfiles/240404_Nax"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 
