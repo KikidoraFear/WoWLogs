@@ -115,7 +115,7 @@ def BarPlot(ax, df, subkind, section, players_sep):
             val_col = "eheal"
             idx = (dff["source"]==source)
             y_bar_oheal = np.append(y_bar_oheal, dff[idx]["oheal"].sum())
-            y_bar_tot = np.append(y_bar_oheal, dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum())
+            y_bar_tot = np.append(y_bar_tot, dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum())
         x_bar = np.append(x_bar, source)
         y_bar = np.append(y_bar, dff[idx][val_col].sum())
         bar_colors = np.append(bar_colors, class_colours[players[source]["class"]])
