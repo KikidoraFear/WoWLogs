@@ -181,7 +181,6 @@ def BarPlot_Spells(fig, df, subkind, section, players_sep):
 
 def GenSectionPlots(pp, df, players_sep, section):
     px = 1/plt.rcParams['figure.dpi']  # pixel in inches
-
     fig = plt.figure(figsize=(1920*px,1080*px))
     fig.suptitle("Section: " + section)
     gs = fig.add_gridspec(4,2)
@@ -220,6 +219,72 @@ def GenSectionPlots(pp, df, players_sep, section):
     BarPlot_Spells(fig, df, "DAMAGE", section, players_sep)
     plt.close()
     pp.savefig(fig)
+
+def GenDeathPlots(pp, df, players, section):
+    if section == "All":
+        dff = df
+    elif section == "Bosses":
+        dff = df[df["section"] != ""]
+    elif section == "Trash":
+        dff = df[(df["section"] == "") & (df["incombat"])]
+    else:
+        dff = df[df["section"] == section]
+    dff.reset_index(inplace=True)
+
+    px = 1/plt.rcParams['figure.dpi']  # pixel in inches
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: " + section + " (Deaths)")
+
+    timestamps = np.array([])
+    labels = np.array([])
+    lin_cols = np.array([])
+    ann_size = np.array([])
+    for player in players:
+        class_col = class_colours[players[player]["class"]]
+        idxs_deaths = dff[(dff["source"]==player) & (dff["subkind"]=="DIES")].index
+        for idx_death in idxs_deaths:
+            timestamp_death = dff.loc[idx_death, "timestamp"] + 1 # add 1 second so "...dies." comes last (sometimes hit is logged after death)
+            timestamps = np.append(timestamps, timestamp_death)
+            labels = np.append(labels, dff.loc[idx_death, "line_mod"])
+            lin_cols = np.append(lin_cols, class_col)
+            ann_size = np.append(ann_size, 15)
+            idx_ext = idx_death
+            while (dff.loc[idx_ext, "timestamp"] < timestamp_death + 1) & (idx_ext < len(dff)-1): # include events 1 second after death (sometimes death first, hit taken logged later)
+                idx_ext += 1
+            ct_entries = 0
+            while (idx_ext>=0) & (ct_entries < 3): # find last 4 entries,
+                if (dff.loc[idx_ext, "timestamp"] < timestamp_death - 20): # maximum of x seconds in the past
+                    break
+                if (dff.loc[idx_ext, "target"] == player) & (dff.loc[idx_ext, "subkind"] == "DAMAGE"):
+                    timestamps = np.append(timestamps, dff.loc[idx_ext, "timestamp"])
+                    labels = np.append(labels, dff.loc[idx_ext, "line_mod"])
+                    lin_cols = np.append(lin_cols, class_col)
+                    ann_size = np.append(ann_size, 8)
+                    ct_entries += 1
+                idx_ext -= 1
+    
+    idx_s = np.argsort(timestamps)
+    levels = np.linspace(10, 100, np.size(timestamps))
+    ax = plt.gca()
+    ax.vlines(timestamps[idx_s], 0, levels, color=lin_cols[idx_s])  # The vertical stems.
+    ax.plot(timestamps[idx_s], np.zeros_like(timestamps), "-o",
+        color="k", markerfacecolor="w")  # Baseline and markers on it.
+    # ax.scatter(timestamps[idx_s], levels, c=lin_cols[idx_s])
+
+    # annotate lines
+    for d, l, r, c, s in zip(timestamps[idx_s], levels, labels[idx_s], lin_cols[idx_s], ann_size[idx_s]):
+        ax.annotate(r, xy=(d, l),
+            # xytext=(-3, np.sign(l)*3), textcoords="offset points",
+            horizontalalignment="center",
+            verticalalignment="bottom",
+            size=s,
+            color=c)
+        
+    ax.yaxis.set_visible(False)
+    ax.spines[["left", "top", "right"]].set_visible(False)
+
+    plt.close()
+    pp.savefig(fig)
    
 
 def Visualise(df, players, folder):
@@ -243,8 +308,13 @@ def Visualise(df, players, folder):
     sections_unique = df["section"].unique()
     for section in sections_unique:
         if section: # dont show empty section
+            print("Section: " + section)
             GenSectionPlots(pp, df, players_sep, section)
+            GenDeathPlots(pp, df, players, section)
+    print()
 
+
+    # df[df["subkind"]=="DIES"]
     print("Add Death summary for each player (analyse seconds after as well (death sometimes registered first))\n\
           https://matplotlib.org/stable/gallery/lines_bars_and_markers/timeline.html#sphx-glr-gallery-lines-bars-and-markers-timeline-py")
 
