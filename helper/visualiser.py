@@ -216,7 +216,7 @@ def GenSectionPlots(pp, df, players_sep, section):
     # Heal Spells
     fig = plt.figure(figsize=(1920*px,1080*px))
     fig.suptitle("Section: " + section + " (Healing)")
-    BarPlot_Spells(fig, df, "DAMAGE", section, players_sep)
+    BarPlot_Spells(fig, df, "HEAL", section, players_sep)
     plt.close()
     pp.savefig(fig)
 
