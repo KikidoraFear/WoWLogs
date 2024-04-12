@@ -84,11 +84,11 @@ def CalcSections(line_log, inp):
 
     # sections (bosses)
     # -> sometimes boss is in logs without incombat (e.g. hunter's mark) -> no boss section
-    # ToDo: -> sometimes boss fight starts without boss being in the logs (Gothik) -> boss translator
-    if (line_log["source"] in bosses) and inp["incombat"]:
+    # -> sometimes boss fight starts without boss being in the logs (Gothik) -> boss translator
+    if (line_log["source"] in bosses) and (line_log["subkind"] == "DAMAGE"):# and inp["incombat"]:
         inp["section"] = line_log["source"]
         inp["t_section"] = line_log["timestamp"]
-    elif (line_log["target"] in bosses) and inp["incombat"]:
+    elif (line_log["target"] in bosses) and (line_log["subkind"] == "DAMAGE"):# and inp["incombat"]:
         inp["section"] = line_log["target"]
         inp["t_section"] = line_log["timestamp"]
     if (line_log["timestamp"] > inp["t_section"]+inp["t_cd_section"]) and not inp["incombat"]:

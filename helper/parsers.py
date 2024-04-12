@@ -27,6 +27,7 @@ def PrepareLine(line, data_source):
     line = line.replace("Your", data_source+"'s")
     line = line.replace("your", data_source+"'s")
     line = line.replace("you", data_source)
+    line = line.replace(" 's", "'s") # advanced combat log compatibilty
     return line
 
 def ParseTimeStamp(line):

@@ -12,7 +12,7 @@ from helper.syncer import *
 from helper.calculator import *
 from helper.visualiser import *
 
-folder = r"Logfiles/240411_Nax"
+folder = r"Logfiles/240411_Nax_ACL"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 
@@ -27,12 +27,13 @@ for filepath in filepaths:
     filename = Path(filepath).stem
     data_kind = filename.split("_")[0]
     data_source = filename.split("_")[1]
-    file = open(filepath, 'r')
+    file = open(filepath, 'r', encoding='utf-8') # utf-8 better than charmap (default)
     lines = file.readlines()
     for idx, line in enumerate(lines):
         if (idx%1000==0) or (idx==len(lines)-1):
             print("Parsing line "+str(idx+1)+"/"+str(len(lines)), end='\r')
-        ParseCombatLog(data_source, line, patterns_base, dict_log)
+        if (not "COMBATANT_INFO:" in line) & (not "CONSOLIDATED:" in line): # skip advanced combat log shenanigans (adds that kind of stuff)
+            ParseCombatLog(data_source, line, patterns_base, dict_log)
     print()
 
 #################

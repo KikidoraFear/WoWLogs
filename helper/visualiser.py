@@ -122,6 +122,8 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
         bar_colors = np.append(bar_colors, class_colours[players[source]["class"]])
     idx_s = np.argsort(y_bar)
     ax.barh(x_bar[idx_s], y_bar[idx_s], color=bar_colors[idx_s])
+    if subkind=="HEAL":
+        ax.barh(x_bar[idx_s], y_bar_tot[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
     for idxs in idx_s:
         if subkind=="DAMAGE":
             ax.text(y_bar[idxs], x_bar[idxs], "{:.0f}".format(y_bar[idxs]), fontsize=FONT_SIZE, va="center")
@@ -247,7 +249,7 @@ def GenDeathPlots(pp, df, players, section):
             timestamps = np.append(timestamps, timestamp_death)
             labels = np.append(labels, dff.loc[idx_death, "line_mod"])
             lin_cols = np.append(lin_cols, class_col)
-            ann_size = np.append(ann_size, 15)
+            ann_size = np.append(ann_size, 2)
             idx_ext = idx_death
             while (dff.loc[idx_ext, "timestamp"] < timestamp_death + 1) & (idx_ext < len(dff)-1): # include events 1 second after death (sometimes death first, hit taken logged later)
                 idx_ext += 1
@@ -259,28 +261,41 @@ def GenDeathPlots(pp, df, players, section):
                     timestamps = np.append(timestamps, dff.loc[idx_ext, "timestamp"])
                     labels = np.append(labels, dff.loc[idx_ext, "line_mod"])
                     lin_cols = np.append(lin_cols, class_col)
-                    ann_size = np.append(ann_size, 8)
+                    ann_size = np.append(ann_size, 1)
                     ct_entries += 1
                 idx_ext -= 1
     
     idx_s = np.argsort(timestamps)
     levels = np.linspace(10, 100, np.size(timestamps))
     ax = plt.gca()
-    ax.vlines(timestamps[idx_s], 0, levels, color=lin_cols[idx_s])  # The vertical stems.
+    ax.vlines(timestamps[idx_s], 0, levels[idx_s], color=lin_cols[idx_s], linewidth=0.1, alpha=0.1)  # The vertical stems.
     ax.plot(timestamps[idx_s], np.zeros_like(timestamps), "-o",
         color="k", markerfacecolor="w")  # Baseline and markers on it.
     # ax.scatter(timestamps[idx_s], levels, c=lin_cols[idx_s])
 
+    if np.size(timestamps) > 0:
+        ann_size_mult = np.maximum(np.minimum(200/np.size(timestamps),10),1)
+    else:
+        ann_size_mult = 1
     # annotate lines
-    for d, l, r, c, s in zip(timestamps[idx_s], levels, labels[idx_s], lin_cols[idx_s], ann_size[idx_s]):
+    for d, l, r, c, s in zip(timestamps[idx_s], levels[idx_s], labels[idx_s], lin_cols[idx_s], ann_size[idx_s]*ann_size_mult):
         ax.annotate(r, xy=(d, l),
             # xytext=(-3, np.sign(l)*3), textcoords="offset points",
             horizontalalignment="center",
             verticalalignment="bottom",
             size=s,
             color=c)
+    # text
+    # for d, l, r, c, s in zip(timestamps[idx_s], levels[idx_s], labels[idx_s], lin_cols[idx_s], ann_size[idx_s]):
+    #     plt.text(d, l, r,
+    #         # xytext=(-3, np.sign(l)*3), textcoords="offset points",
+    #         horizontalalignment="center",
+    #         verticalalignment="bottom",
+    #         size=s,
+    #         color=c)
         
     ax.yaxis.set_visible(False)
+    # ax.xaxis.set_visible(False)
     ax.spines[["left", "top", "right"]].set_visible(False)
 
     plt.close()
