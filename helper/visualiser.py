@@ -102,6 +102,8 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
     x_bar = np.array([])
     y_bar = np.array([])
     y_bar_tot = np.array([])
+    y_bar_est_eheal = np.array([])
+    y_bar_est_oheal = np.array([])
     bar_colors = np.array([])
     for source in players:
         if subkind=="DAMAGE":
@@ -116,19 +118,33 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
             else:
                 val_col = "eheal"
             idx = (dff["source"]==source)
-            y_bar_tot = np.append(y_bar_tot, dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum())
+            heal_add = dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum()
+            if dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum()>0:
+                eheal_fac = dff[idx]["eheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
+                oheal_fac = dff[idx]["oheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
+            else:
+                eheal_fac = 0
+                oheal_fac = 1
+            y_bar_est_eheal = np.append(y_bar_est_eheal, heal_add*eheal_fac)
+            y_bar_est_oheal = np.append(y_bar_est_oheal, heal_add*oheal_fac)
         x_bar = np.append(x_bar, source)
         y_bar = np.append(y_bar, dff[idx][val_col].sum())
         bar_colors = np.append(bar_colors, class_colours[players[source]["class"]])
     idx_s = np.argsort(y_bar)
     ax.barh(x_bar[idx_s], y_bar[idx_s], color=bar_colors[idx_s])
     if subkind=="HEAL":
-        ax.barh(x_bar[idx_s], y_bar_tot[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
+        if oheal:
+            ax.barh(x_bar[idx_s], y_bar_est_oheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
+        else:
+            ax.barh(x_bar[idx_s], y_bar_est_eheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
     for idxs in idx_s:
         if subkind=="DAMAGE":
             ax.text(y_bar[idxs], x_bar[idxs], "{:.0f}".format(y_bar[idxs]), fontsize=FONT_SIZE, va="center")
         elif subkind=="HEAL":
-            ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_tot[idxs]), fontsize=FONT_SIZE, va="center")
+            if oheal:
+                ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_oheal[idxs]), fontsize=FONT_SIZE, va="center")
+            else:
+                ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_eheal[idxs]), fontsize=FONT_SIZE, va="center")
 
     ax.tick_params(labelbottom=False)
 
