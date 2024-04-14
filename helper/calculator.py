@@ -14,9 +14,9 @@ bosses = [
         "Hakkar", "Bloodlord Mandokir", "Jin'do the Hexxer", "Gahz'ranka",
     # The Molten Core
     "Baron Geddon", "Garr", "Gehennas", "Golemagg the Incinerator", "Lucifron", "Magmadar", "Shazzrah", "Sulfuron Harbinger", "Majordomo Executus", "Ragnaros",
-    "Flamewaker Elite", "Flamewaker Healer", "Son of Flame", "Flamewaker Priest"
+        "Flamewaker Elite", "Flamewaker Healer", "Son of Flame", "Flamewaker Priest"
     # Blackwing Lair
-    "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt",
+    "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt", "Nefarian",
     # ES
     "Erennius", "Solnius"
 ]
@@ -27,6 +27,8 @@ bosses_translator = {
     "Flamewaker Healer": "Majordomo Executus",
     "Son of Flame": "Ragnaros",
     "Flamewaker Priest": "Sulfuron Harbinger",
+    # BWL
+    "Lord Victor Nefarius": "Nefarian",
     # Ahn'Qiraj
     "Sartura's Royal Guard": "Battleguard Sartura",
     "Lord Kri": "Bug Trio",

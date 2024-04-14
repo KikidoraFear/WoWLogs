@@ -310,13 +310,14 @@ def Visualise(df, players, folder):
     print("Plot Section: All")
     GenSectionPlots(pp, df, players_sep, "All")
 
-    # SECTION: TRASH
-    print("Plot Section: Trash")
-    GenSectionPlots(pp, df, players_sep, "Trash")
-
     # SECTION: BOSSES
     print("Plot Section: Bosses")
     GenSectionPlots(pp, df, players_sep, "Bosses")
+
+    # SECTION: TRASH
+    print("Plot Section: Trash")
+    GenSectionPlots(pp, df, players_sep, "Trash")
+    GenDeathPlots(pp, df, players, "Trash")   
 
     # SECTION: BOSS
     print("Plot Section: Boss")
