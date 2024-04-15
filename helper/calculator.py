@@ -11,7 +11,7 @@ bosses = [
         "Unrelenting Trainee", "Unrelenting Deathknight", "Unrelenting Rider", "Spectral Trainee", "Spectral Deathknight", "Spectral Rider"
     # Zul'Gurub
     "High Priestess Jeklik", "High Priest Venoxis", "High Priestess Mar'li", "High Priest Thekal", "High Priestess Arlokk",
-        "Hakkar", "Bloodlord Mandokir", "Jin'do the Hexxer", "Gahz'ranka",
+        "Hakkar", "Bloodlord Mandokir", "Jin'do the Hexxer", "Gahz'ranka", "Gri'lek",
     # The Molten Core
     "Baron Geddon", "Garr", "Gehennas", "Golemagg the Incinerator", "Lucifron", "Magmadar", "Shazzrah", "Sulfuron Harbinger", "Majordomo Executus", "Ragnaros",
         "Flamewaker Elite", "Flamewaker Healer", "Son of Flame", "Flamewaker Priest"

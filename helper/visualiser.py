@@ -123,8 +123,8 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
                 eheal_fac = dff[idx]["eheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
                 oheal_fac = dff[idx]["oheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
             else:
-                eheal_fac = 0
-                oheal_fac = 1
+                eheal_fac = 1
+                oheal_fac = 0
             y_bar_est_eheal = np.append(y_bar_est_eheal, heal_add*eheal_fac)
             y_bar_est_oheal = np.append(y_bar_est_oheal, heal_add*oheal_fac)
         x_bar = np.append(x_bar, source)
