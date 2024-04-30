@@ -13,9 +13,9 @@ patterns_base = [
     # PERIODICAURA #
     ################
     # DAMAGE
-    ["PERIODICAURADAMAGEOTHEROTHER", "%s suffers %d %s damage from %s's %s.", ["target", "value", "school", "source", "spell"], "PERIODICAURA", "DAMAGE"],
+    ["PERIODICAURADAMAGEOTHEROTHER", "%s suffers %d %s damage from %s's %s.", ["target", "value", "school", "source", "spell"], "DAMAGE", "HIT"],
     # HEAL - added eheal
-    ["PERIODICAURAHEALOTHEROTHER", "%s gains %d health from %s's %s.", ["target", "value", "source", "spell"], "PERIODICAURA", "HEAL"],
+    ["PERIODICAURAHEALOTHEROTHER", "%s gains %d health from %s's %s.", ["target", "value", "source", "spell"], "HEAL", "HIT"],
 
     #########
     # POWER #
@@ -47,24 +47,24 @@ patterns_base = [
     ["SPELLTERSEPERFORM_OTHER", "%s performs %s.", ["source", "spell"], "SPELL", "PERFORM"],
     ["SPELLPERFORMGOOTHER", "%s performs %s.", ["source", "spell"], "SPELL", "PERFORM"],
     # RESIST
-    ["SPELLRESISTOTHEROTHER", "%s's %s was resisted by %s.", ["source", "spell", "target"], "SPELL", "RESIST"],
-    ["SPELLRESISTOTHERSELF", "%s's %s was resisted.", ["source", "spell"], "SPELL", "RESISTED"],
+    ["SPELLRESISTOTHEROTHER", "%s's %s was resisted by %s.", ["source", "spell", "target"], "DAMAGE", "RESISTED"],
+    ["SPELLRESISTOTHERSELF", "%s's %s was resisted.", ["source", "spell"], "DAMAGE", "RESISTED"],
     # DODGED
-    ["SPELLDODGEDOTHEROTHER", "%s's %s was dodged by %s.", ["source", "spell", "target"], "SPELL", "DODGED"],
-    ["SPELLDODGEDOTHERSELF", "%s's %s was dodged.", ["source", "spell"], "SPELL", "DODGED"],
+    ["SPELLDODGEDOTHEROTHER", "%s's %s was dodged by %s.", ["source", "spell", "target"], "DAMAGE", "DODGED"],
+    ["SPELLDODGEDOTHERSELF", "%s's %s was dodged.", ["source", "spell"], "DAMAGE", "DODGED"],
     # PARRIED
-    ["SPELLPARRIEDOTHEROTHER", "%s's %s was parried by %s.", ["source", "spell", "target"], "SPELL", "PARRIED"],
-    ["SPELLPARRIEDOTHERSELF", "%s's %s was parried.", ["source", "spell"], "SPELL", "PARRIED"],
-    ["SPELLPARRIEDSELFOTHER", "%s's %s is parried by %s.", [], "SPELL", "PARRIED"], # MODIFIED "Your %s is parried by %s."
+    ["SPELLPARRIEDOTHEROTHER", "%s's %s was parried by %s.", ["source", "spell", "target"], "DAMAGE", "PARRIED"],
+    ["SPELLPARRIEDOTHERSELF", "%s's %s was parried.", ["source", "spell"], "DAMAGE", "PARRIED"],
+    ["SPELLPARRIEDSELFOTHER", "%s's %s is parried by %s.", [], "DAMAGE", "PARRIED"], # MODIFIED "Your %s is parried by %s."
     # FAILCAST
     ["SPELLFAILCASTOTHER", "%s fails to cast %s: %s.", ["source", "spell", "school"], "SPELL", "FAILCAST"],
     # IMMUNE
-    ["SPELLIMMUNEOTHEROTHER", "%s's %s fails. %s is immune.", ["source", "spell", "target"], "SPELL", "IMMUNE"],
-    ["SPELLIMMUNESELFOTHER", "%s's %s failed. %s is immune.", ["source", "spell", "target"], "SPELL", "IMMUNE"], # MODIFIED "Your %s failed. %s is immune."
+    ["SPELLIMMUNEOTHEROTHER", "%s's %s fails. %s is immune.", ["source", "spell", "target"], "DAMAGE", "IMMUNE"],
+    ["SPELLIMMUNESELFOTHER", "%s's %s failed. %s is immune.", ["source", "spell", "target"], "DAMAGE", "IMMUNE"], # MODIFIED "Your %s failed. %s is immune."
     # MISS
-    ["SPELLMISSOTHEROTHER", "%s's %s missed %s.", ["source", "spell", "target"], "SPELL", "MISS"],
+    ["SPELLMISSOTHEROTHER", "%s's %s missed %s.", ["source", "spell", "target"], "DAMAGE", "MISSED"],
     # BLOCK
-    ["SPELLBLOCKEDOTHEROTHER", "%s's %s was blocked by %s.", ["source", "spell", "target"], "SPELL", "BLOCK"],
+    ["SPELLBLOCKEDOTHEROTHER", "%s's %s was blocked by %s.", ["source", "spell", "target"], "DAMAGE", "BLOCKED"],
     # INTERRUPT
     ["SPELLINTERRUPTOTHEROTHER", "%s interrupts %s's %s.", ["source", "target", "spell"], "SPELL", "INTERRUPT"],
     # DISMISSPET
@@ -72,9 +72,9 @@ patterns_base = [
     # FAILPERFORM
     ["SPELLFAILPERFORMOTHER", "%s fails to perform %s: %s.", ["source", "spell", "school"], "SPELL", "FAILPERFORM"],
     # EVADE
-    ["SPELLEVADEDOTHEROTHER", "%s's %s was evaded by %s.", ["source", "spell", "target"], "SPELL", "EVADED"],
+    ["SPELLEVADEDOTHEROTHER", "%s's %s was evaded by %s.", ["source", "spell", "target"], "DAMAGE", "EVADED"],
     # REFLECT
-    ["SPELLREFLECTOTHEROTHER", "%s's %s is reflected back by %s.", ["source", "spell", "target"], "SPELL", "EVADED"],
+    ["SPELLREFLECTOTHEROTHER", "%s's %s is reflected back by %s.", ["source", "spell", "target"], "SPELL", "REFLECTED"],
 
     ##############
     # SPELLPOWER #
@@ -85,7 +85,7 @@ patterns_base = [
     ##########
     # IMMUNE #
     ##########
-    ["IMMUNESPELLOTHEROTHER", "%s is immune to %s's %s.", ["target", "source", "spell"], "IMMUNE", "SPELL"],
+    ["IMMUNESPELLOTHEROTHER", "%s is immune to %s's %s.", ["target", "source", "spell"], "DAMAGE", "IMMUNE"],
 
     #########
     # INSTA #
@@ -105,23 +105,23 @@ patterns_base = [
     # SPELLLOG #
     ############
     # LOG
-    ["SPELLLOGSCHOOLOTHEROTHER", "%s's %s hits %s for %d %s damage.", ["source", "spell", "target", "value", "school"], "SPELLLOG", "DAMAGE"], # parse before COMBATHITSCHOOLOTHEROTHER
-    ["SPELLLOGCRITSCHOOLOTHEROTHER", "%s's %s crits %s for %d %s damage.", ["source", "spell", "target", "value", "school"], "SPELLLOG", "DAMAGE"], # parse before COMBATHITCRITSCHOOLOTHEROTHER
-    ["SPELLLOGOTHEROTHER", "%s's %s hits %s for %d.", ["source", "spell", "target", "value"], "SPELLLOG", "DAMAGE"], # parse before COMBATHITOTHEROTHER
-    ["SPELLLOGCRITOTHEROTHER", "%s's %s crits %s for %d.", ["source", "spell", "target", "value"], "SPELLLOG", "DAMAGE"], # parse before COMBATHITCRITOTHEROTHER
+    ["SPELLLOGSCHOOLOTHEROTHER", "%s's %s hits %s for %d %s damage.", ["source", "spell", "target", "value", "school"], "DAMAGE", "HIT"], # parse before COMBATHITSCHOOLOTHEROTHER
+    ["SPELLLOGCRITSCHOOLOTHEROTHER", "%s's %s crits %s for %d %s damage.", ["source", "spell", "target", "value", "school"], "DAMAGE", "CRIT"], # parse before COMBATHITCRITSCHOOLOTHEROTHER
+    ["SPELLLOGOTHEROTHER", "%s's %s hits %s for %d.", ["source", "spell", "target", "value"], "DAMAGE", "HIT"], # parse before COMBATHITOTHEROTHER
+    ["SPELLLOGCRITOTHEROTHER", "%s's %s crits %s for %d.", ["source", "spell", "target", "value"], "DAMAGE", "CRIT"], # parse before COMBATHITCRITOTHEROTHER
     # ABSORB
     ["SPELLLOGABSORBOTHEROTHER", "%s's %s is absorbed by %s.", ["source", "spell", "target"], "SPELLLOG", "ABSORB"],
 
     ##############
     # SPELLSPLIT #
     ##############
-    ["SPELLSPLITDAMAGEOTHEROTHER", "%s's %s causes %s %d damage.", ["source", "spell", "target", "value"], "SPELLSPLIT", "DAMAGE"],
+    ["SPELLSPLITDAMAGEOTHEROTHER", "%s's %s causes %s %d damage.", ["source", "spell", "target", "value"], "DAMAGE", "HIT"],
 
     ##########
     # HEALED #
     ##########
-    ["HEALEDCRITOTHEROTHER", "%s's %s critically heals %s for %d.", ["source", "spell", "target", "value"], "HEALED", "HEAL"], # parse before HEALEDOTHEROTHER
-    ["HEALEDOTHEROTHER", "%s's %s heals %s for %d.", ["source", "spell", "target", "value"], "HEALED", "HEAL"],
+    ["HEALEDCRITOTHEROTHER", "%s's %s critically heals %s for %d.", ["source", "spell", "target", "value"], "HEAL", "CRIT"], # parse before HEALEDOTHEROTHER
+    ["HEALEDOTHEROTHER", "%s's %s heals %s for %d.", ["source", "spell", "target", "value"], "HEAL", "HIT"],
 
     #########
     # TRADE #
@@ -139,30 +139,30 @@ patterns_base = [
     # COMBAT #
     ##########
     # HIT
-    ["COMBATHITOTHEROTHER", "%s hits %s for %d.", ["source", "target", "value"], "COMBAT", "DAMAGE"],
-    ["COMBATHITSCHOOLOTHEROTHER", "%s hits %s for %d %s damage.", ["source", "target", "value", "school"], "COMBAT", "DAMAGE"],
+    ["COMBATHITOTHEROTHER", "%s hits %s for %d.", ["source", "target", "value"], "DAMAGE", "HIT"],
+    ["COMBATHITSCHOOLOTHEROTHER", "%s hits %s for %d %s damage.", ["source", "target", "value", "school"], "DAMAGE", "HIT"],
     # HITCRIT
-    ["COMBATHITCRITOTHEROTHER", "%s crits %s for %d.", ["source", "target", "value"], "COMBAT", "DAMAGE"],
-    ["COMBATHITCRITSCHOOLOTHEROTHER", "%s crits %s for %d %s damage.", ["source", "target", "value", "school"], "COMBAT", "DAMAGE"],
+    ["COMBATHITCRITOTHEROTHER", "%s crits %s for %d.", ["source", "target", "value"], "DAMAGE", "CRIT"],
+    ["COMBATHITCRITSCHOOLOTHEROTHER", "%s crits %s for %d %s damage.", ["source", "target", "value", "school"], "DAMAGE", "CRIT"],
 
     ##########
     # MISSED #
     ##########
-    ["MISSEDOTHEROTHER", "%s misses %s.", ["source", "target"], "MISSED", ""],
+    ["MISSEDOTHEROTHER", "%s misses %s.", ["source", "target"], "DAMAGE", "MISS"],
 
     ######
     # VS #
     ######
     # PARRY
-    ["VSPARRYOTHEROTHER", "%s attacks. %s parries.", ["source", "target"], "VS", "PARRY"],
+    ["VSPARRYOTHEROTHER", "%s attacks. %s parries.", ["source", "target"], "DAMAGE", "PARRY"],
     # ABSORB
-    ["VSABSORBOTHEROTHER", "%s attacks. %s absorbs all the damage.", ["source", "target"], "VS", "ABSORB"],
+    ["VSABSORBOTHEROTHER", "%s attacks. %s absorbs all the damage.", ["source", "target"], "DAMAGE", "ABSORB"],
     # DODGE
-    ["VSDODGEOTHEROTHER", "%s attacks. %s dodges.", ["source", "target"], "VS", "DODGE"],
+    ["VSDODGEOTHEROTHER", "%s attacks. %s dodges.", ["source", "target"], "DAMAGE", "DODGE"],
     # BLOCK
-    ["VSBLOCKOTHEROTHER", "%s attacks. %s blocks.", ["source", "target"], "VS", "BLOCK"],
+    ["VSBLOCKOTHEROTHER", "%s attacks. %s blocks.", ["source", "target"], "DAMAGE", "BLOCK"],
     # IMMUNE
-    ["VSIMMUNEOTHEROTHER", "%s attacks but %s is immune.", ["source", "target"], "VS", "IMMUNE"],
+    ["VSIMMUNEOTHEROTHER", "%s attacks but %s is immune.", ["source", "target"], "DAMAGE", "IMMUNE"],
     # ENVIRONMENTALDAMAGE_FALLING
     ["VSENVIRONMENTALDAMAGE_FALLING_OTHER", "%s falls and loses %d health.", ["target", "value"], "VS", "ENVIRONMENTALDAMAGE_FALLING"],
     # ENVIRONMENTALDAMAGE_LAVA
@@ -174,7 +174,7 @@ patterns_base = [
     # DAMAGE #
     ##########
     # SHIELD
-    ["DAMAGESHIELDOTHEROTHER", "%s reflects %d %s damage to %s.", ["target", "value", "school", "source"], "DAMAGESHIELD", "DAMAGE"],
+    ["DAMAGESHIELDOTHEROTHER", "%s reflects %d %s damage to %s.", ["target", "value", "school", "source"], "DAMAGE", "REFLECTS"],
 
     #########
     # PARTY #
@@ -204,7 +204,7 @@ patterns_base = [
     # SPELLLOG #
     ############
     # ABSORB
-    ["SPELLLOGABSORBOTHERSELF", "%s absorbs %s's %s.", ["target", "source", "spell"], "SPELLLOG", "ABSORB"],
+    ["SPELLLOGABSORBOTHERSELF", "%s absorbs %s's %s.", ["target", "source", "spell"], "DAMAGE", "ABSORB"],
 
     #########
     # PARTY #

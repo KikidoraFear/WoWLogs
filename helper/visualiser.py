@@ -6,7 +6,7 @@ import math
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
-FONT_SIZE = 8
+FONT_SIZE = 6
 
 class_colours = {
     "WARRIOR": "peru",
@@ -21,8 +21,8 @@ class_colours = {
 }
 
 def GetPlayersSep(df, players): # separate players by damage/heal
-    df_damage = df[df["subkind"]=="DAMAGE"]
-    df_heal = df[df["subkind"]=="HEAL"]
+    df_damage = df[df["kind"]=="DAMAGE"]
+    df_heal = df[df["kind"]=="HEAL"]
     players_sep = {
         "DAMAGE": {},
         "HEAL": {}
@@ -44,8 +44,8 @@ def GetPlayersSep(df, players): # separate players by damage/heal
     return players_sep
 
 
-def LinePlot(ax, df, subkind, section, players_sep):
-    dff = df[df["subkind"]==subkind]
+def LinePlot(ax, df, kind, section, players_sep):
+    dff = df[df["kind"]==kind]
 
     if section == "All":
         dff = dff
@@ -60,16 +60,16 @@ def LinePlot(ax, df, subkind, section, players_sep):
         dff = dff[dff["section"] == section]
         draw_section = False
 
-    players = players_sep[subkind]
+    players = players_sep[kind]
     for source in players:
         line_color = class_colours[players[source]["class"]]
-        if subkind=="DAMAGE":
+        if kind=="DAMAGE":
             val_col = "value"
             idx = (dff["source"]==source) & (dff["target"]!=source) # damage to self shouldnt add to damage (warlock hellfire,...)
             pet_name = players[source]["pet"]
             if pet_name:
                 idx = idx | ((dff["source"]==pet_name) & (dff["target"]!=pet_name)) # add pet to damage
-        elif subkind=="HEAL":
+        elif kind=="HEAL":
             val_col = "eheal"
             idx = (dff["source"]==source)
         time = np.array(dff[idx]["timestamp"])
@@ -86,9 +86,12 @@ def LinePlot(ax, df, subkind, section, players_sep):
                 ax.fill_between(df["timestamp"], y_min, y_max, where=idx_section, label=section, alpha=0.5)
                 ax.set_ylim(y_min, y_max) # ylim is changed when using fill_between -> set it back to previous values
         ax.legend(prop={'size': 6})
+    
+    ax.tick_params(which="both", left=False, labelleft=False)
+    ax.tick_params(axis="x", labelsize=FONT_SIZE)
 
-def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
-    dff = df[df["subkind"]==subkind]
+def BarPlot(ax, df, kind, section, players_sep, oheal=False):
+    dff = df[df["kind"]==kind]
     if section == "All":
         dff = dff
     elif section == "Bosses":
@@ -98,7 +101,7 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
     else:
         dff = dff[dff["section"] == section]
 
-    players = players_sep[subkind]
+    players = players_sep[kind]
     x_bar = np.array([])
     y_bar = np.array([])
     y_bar_tot = np.array([])
@@ -106,13 +109,13 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
     y_bar_est_oheal = np.array([])
     bar_colors = np.array([])
     for source in players:
-        if subkind=="DAMAGE":
+        if kind=="DAMAGE":
             val_col = "value"
             idx = (dff["source"]==source) & (dff["target"]!=source) # damage to self shouldnt add to damage (warlock hellfire,...)
             pet_name = players[source]["pet"]
             if pet_name:
                 idx = idx | ((dff["source"]==pet_name) & (dff["target"]!=pet_name)) # add pet to damage
-        elif subkind=="HEAL":
+        elif kind=="HEAL":
             if oheal:
                 val_col = "oheal"
             else:
@@ -132,24 +135,25 @@ def BarPlot(ax, df, subkind, section, players_sep, oheal=False):
         bar_colors = np.append(bar_colors, class_colours[players[source]["class"]])
     idx_s = np.argsort(y_bar)
     ax.barh(x_bar[idx_s], y_bar[idx_s], color=bar_colors[idx_s])
-    if subkind=="HEAL":
+    if kind=="HEAL":
         if oheal:
             ax.barh(x_bar[idx_s], y_bar_est_oheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
         else:
             ax.barh(x_bar[idx_s], y_bar_est_eheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
     for idxs in idx_s:
-        if subkind=="DAMAGE":
+        if kind=="DAMAGE":
             ax.text(y_bar[idxs], x_bar[idxs], "{:.0f}".format(y_bar[idxs]), fontsize=FONT_SIZE, va="center")
-        elif subkind=="HEAL":
+        elif kind=="HEAL":
             if oheal:
                 ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_oheal[idxs]), fontsize=FONT_SIZE, va="center")
             else:
                 ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_eheal[idxs]), fontsize=FONT_SIZE, va="center")
 
-    ax.tick_params(labelbottom=False)
+    ax.tick_params(which="both", bottom=False, labelbottom=False)
+    ax.tick_params(axis="y", labelsize=FONT_SIZE)
 
-def BarPlot_Spells(fig, df, subkind, section, players_sep):
-    dff = df[df["subkind"]==subkind]
+def BarPlot_Spells(fig, df, kind, section, players_sep):
+    dff = df[df["kind"]==kind]
     if section == "All":
         dff = dff
     elif section == "Bosses":
@@ -159,7 +163,7 @@ def BarPlot_Spells(fig, df, subkind, section, players_sep):
     else:
         dff = dff[dff["section"] == section]
 
-    players = players_sep[subkind]
+    players = players_sep[kind]
 
     players_amount = len(players)
     rows = math.ceil(math.sqrt(players_amount))
@@ -172,30 +176,52 @@ def BarPlot_Spells(fig, df, subkind, section, players_sep):
         ax = fig.add_subplot(gs[row, col])
         class_col = class_colours[players[source]["class"]]
         ax.set_title(source, color=class_col)
-        if subkind=="DAMAGE":
+        if kind=="DAMAGE":
             val_col = "value"
             idx = (dff["source"]==source) & (dff["target"]!=source) # damage to self shouldnt add to damage (warlock hellfire,...)
             pet_name = players[source]["pet"]
             if pet_name:
                 idx = idx | ((dff["source"]==pet_name) & (dff["target"]!=pet_name)) # add pet to damage
-        elif subkind=="HEAL":
+        elif kind=="HEAL":
             val_col = "eheal"
             idx = (dff["source"]==source)
         dff_player = dff[idx]
         spell_unique = dff_player["spell"].unique()
         x_bar = np.array([])
         y_bar = np.array([])
+        y_bar_cnt = np.array([])
+        y_bar_crit = np.array([])
+        y_bar_hit = np.array([])
+        y_bar_avg = np.array([])
+        y_bar_max = np.array([])
         for spell in spell_unique:
             idx_spell = (dff_player["spell"]==spell)
-            x_bar = np.append(x_bar, spell)
+            if not spell:
+                x_bar = np.append(x_bar, "Hit")
+            else:
+                x_bar = np.append(x_bar, spell)
             y_bar = np.append(y_bar, dff_player[idx_spell][val_col].sum())
+            y_bar_cnt = np.append(y_bar_cnt, dff_player[idx_spell].shape[0])
+            y_bar_crit = np.append(y_bar_crit, dff_player[idx_spell & (dff_player["subkind"]=="CRIT")].shape[0])
+            y_bar_hit = np.append(y_bar_hit, dff_player[idx_spell & ((dff_player["subkind"]=="HIT") | (dff_player["subkind"]=="CRIT"))].shape[0])
+            y_bar_avg = np.append(y_bar_avg, dff_player[idx_spell][val_col].sum()/dff_player[idx_spell].shape[0])
+            y_bar_max = np.append(y_bar_max, dff_player[idx_spell][val_col].max())
         idx_s = list(np.argsort(y_bar))
         top_spells_max = np.minimum(np.size(y_bar), 4)
         idx_s4 = idx_s[-top_spells_max:]
+
         ax.barh(x_bar[idx_s4], y_bar[idx_s4])
         for x_txt, y_txt in enumerate(y_bar[idx_s4]):
-            ax.text(0, x_txt, "{:.0f}".format(y_txt), fontsize=FONT_SIZE, va="center", ha="left")
-        ax.tick_params(labelbottom=False)
+            ax.text(0, x_txt, "{:.0f} (#:{:.0f} AVG:{:.0f} M:{:.0f} H:{:.2f}% C:{:.2f}%)".format(
+                    y_txt,
+                    y_bar_cnt[idx_s4][x_txt],
+                    y_bar_avg[idx_s4][x_txt],
+                    y_bar_max[idx_s4][x_txt],
+                    y_bar_hit[idx_s4][x_txt]/y_bar_cnt[idx_s4][x_txt]*100,
+                    y_bar_crit[idx_s4][x_txt]/y_bar_cnt[idx_s4][x_txt]*100
+                ), fontsize=FONT_SIZE, va="center", ha="left")
+        ax.tick_params(which="both", bottom=False, labelbottom=False)
+        ax.tick_params(axis="y", labelsize=FONT_SIZE)
 
 def GenSectionPlots(pp, df, players_sep, section):
     px = 1/plt.rcParams['figure.dpi']  # pixel in inches
@@ -233,7 +259,7 @@ def GenSectionPlots(pp, df, players_sep, section):
     pp.savefig(fig)
     # Heal Spells
     fig = plt.figure(figsize=(1920*px,1080*px))
-    fig.suptitle("Section: " + section + " (Healing)")
+    fig.suptitle("Section: " + section + " (Effective Healing)")
     BarPlot_Spells(fig, df, "HEAL", section, players_sep)
     plt.close()
     pp.savefig(fig)
@@ -273,7 +299,7 @@ def GenDeathPlots(pp, df, players, section):
             while (idx_ext>=0) & (ct_entries < 3): # find last 4 entries,
                 if (dff.loc[idx_ext, "timestamp"] < timestamp_death - 20): # maximum of x seconds in the past
                     break
-                if (dff.loc[idx_ext, "target"] == player) & (dff.loc[idx_ext, "subkind"] == "DAMAGE"):
+                if (dff.loc[idx_ext, "target"] == player) & (dff.loc[idx_ext, "kind"] == "DAMAGE"):
                     timestamps = np.append(timestamps, dff.loc[idx_ext, "timestamp"])
                     labels = np.append(labels, dff.loc[idx_ext, "line_mod"])
                     lin_cols = np.append(lin_cols, class_col)
@@ -344,10 +370,5 @@ def Visualise(df, players, folder):
             GenSectionPlots(pp, df, players_sep, section)
             GenDeathPlots(pp, df, players, section)
     print()
-
-
-    # df[df["subkind"]=="DIES"]
-    print("Add Death summary for each player (analyse seconds after as well (death sometimes registered first))\n\
-          https://matplotlib.org/stable/gallery/lines_bars_and_markers/timeline.html#sphx-glr-gallery-lines-bars-and-markers-timeline-py")
 
     pp.close()

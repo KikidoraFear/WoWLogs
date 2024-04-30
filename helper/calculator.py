@@ -77,7 +77,7 @@ def CalcStuff(list_log, t_cd_section):
 def CalcSections(line_log, inp):
 
     # incombat
-    if line_log["subkind"] == "DAMAGE":
+    if line_log["kind"] == "DAMAGE":
         inp["incombat"] = True
         inp["t_incombat"] = line_log["timestamp"]
     if line_log["timestamp"] > inp["t_incombat"]+inp["t_cd_section"]:
@@ -87,10 +87,10 @@ def CalcSections(line_log, inp):
     # sections (bosses)
     # -> sometimes boss is in logs without incombat (e.g. hunter's mark) -> no boss section
     # -> sometimes boss fight starts without boss being in the logs (Gothik) -> boss translator
-    if (line_log["source"] in bosses) and (line_log["subkind"] == "DAMAGE"):# and inp["incombat"]:
+    if (line_log["source"] in bosses) and (line_log["kind"] == "DAMAGE"):# and inp["incombat"]:
         inp["section"] = line_log["source"]
         inp["t_section"] = line_log["timestamp"]
-    elif (line_log["target"] in bosses) and (line_log["subkind"] == "DAMAGE"):# and inp["incombat"]:
+    elif (line_log["target"] in bosses) and (line_log["kind"] == "DAMAGE"):# and inp["incombat"]:
         inp["section"] = line_log["target"]
         inp["t_section"] = line_log["timestamp"]
     if (line_log["timestamp"] > inp["t_section"]+inp["t_cd_section"]) and not inp["incombat"]:
