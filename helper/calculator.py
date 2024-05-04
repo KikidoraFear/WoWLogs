@@ -18,7 +18,9 @@ bosses = [
     # Blackwing Lair
     "Broodlord Lashlayer", "Chromaggus", "Ebonroc", "Firemaw", "Flamegor", "Lord Victor Nefarius", "Razorgore the Untamed", "Vaelastrasz the Corrupt", "Nefarian",
     # ES
-    "Erennius", "Solnius"
+    "Erennius", "Solnius",
+    # Onyxia
+    "Onyxia"
 ]
 
 bosses_translator = {

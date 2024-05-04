@@ -24,6 +24,7 @@ def PrepareLine(line, data_source):
     line = line.replace("You dodge", data_source+" dodges")
     line = line.replace("You miss", data_source+" misses")
     line = line.replace("You perform", data_source+" performs")
+    line = line.replace("You parry", data_source+" parries")
     line = line.replace("Your", data_source+"'s")
     line = line.replace("your", data_source+"'s")
     line = line.replace("you", data_source)

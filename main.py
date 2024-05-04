@@ -12,7 +12,12 @@ from helper.syncer import *
 from helper.calculator import *
 from helper.visualiser import *
 
-folder = r"Logfiles/240411_Nax"
+
+print(r"Create MVP page: if player was x% above second place -> MVP of that segment, \
+      biggest hits, biggest hits taken, most deaths, most dodges/parries/resists/evades, \
+      most interrupts, biggest eheal, highest eheal %")
+
+folder = r"Logfiles/240503_Ony"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 

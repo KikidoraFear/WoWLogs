@@ -104,9 +104,8 @@ def BarPlot(ax, df, kind, section, players_sep, oheal=False):
     players = players_sep[kind]
     x_bar = np.array([])
     y_bar = np.array([])
-    y_bar_tot = np.array([])
-    y_bar_est_eheal = np.array([])
-    y_bar_est_oheal = np.array([])
+    y_bar_heal_prz = np.array([])
+    y_bar_est_heal = np.array([])
     bar_colors = np.array([])
     for source in players:
         if kind=="DAMAGE":
@@ -123,31 +122,24 @@ def BarPlot(ax, df, kind, section, players_sep, oheal=False):
             idx = (dff["source"]==source)
             heal_add = dff[idx]["value"].sum() - dff[idx]["oheal"].sum() - dff[idx]["eheal"].sum()
             if dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum()>0:
-                eheal_fac = dff[idx]["eheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
-                oheal_fac = dff[idx]["oheal"].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
+                heal_fac = dff[idx][val_col].sum()/(dff[idx]["oheal"].sum()+dff[idx]["eheal"].sum())
             else:
-                eheal_fac = 1
-                oheal_fac = 0
-            y_bar_est_eheal = np.append(y_bar_est_eheal, heal_add*eheal_fac)
-            y_bar_est_oheal = np.append(y_bar_est_oheal, heal_add*oheal_fac)
+                heal_fac = 1
+            y_bar_heal_prz = np.append(y_bar_heal_prz, heal_fac*100)
+            y_bar_est_heal = np.append(y_bar_est_heal, heal_add*heal_fac)
         x_bar = np.append(x_bar, source)
         y_bar = np.append(y_bar, dff[idx][val_col].sum())
         bar_colors = np.append(bar_colors, class_colours[players[source]["class"]])
     idx_s = np.argsort(y_bar)
     ax.barh(x_bar[idx_s], y_bar[idx_s], color=bar_colors[idx_s])
     if kind=="HEAL":
-        if oheal:
-            ax.barh(x_bar[idx_s], y_bar_est_oheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
-        else:
-            ax.barh(x_bar[idx_s], y_bar_est_eheal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
+        ax.barh(x_bar[idx_s], y_bar_est_heal[idx_s], left=y_bar[idx_s], color=bar_colors[idx_s], alpha=0.5)
     for idxs in idx_s:
         if kind=="DAMAGE":
             ax.text(y_bar[idxs], x_bar[idxs], "{:.0f}".format(y_bar[idxs]), fontsize=FONT_SIZE, va="center")
         elif kind=="HEAL":
-            if oheal:
-                ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_oheal[idxs]), fontsize=FONT_SIZE, va="center")
-            else:
-                ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} | {:.0f}".format(y_bar[idxs], y_bar_est_eheal[idxs]), fontsize=FONT_SIZE, va="center")
+            ax.text(y_bar[idxs], x_bar[idxs], "{:.0f} ({:.0f}%) | {:.0f}".format(
+                y_bar[idxs], y_bar_heal_prz[idxs], y_bar_est_heal[idxs]), fontsize=FONT_SIZE, va="center")
 
     ax.tick_params(which="both", bottom=False, labelbottom=False)
     ax.tick_params(axis="y", labelsize=FONT_SIZE)
@@ -219,7 +211,7 @@ def BarPlot_Spells(fig, df, kind, section, players_sep):
                     y_bar_max[idx_s4][x_txt],
                     y_bar_hit[idx_s4][x_txt]/y_bar_cnt[idx_s4][x_txt]*100,
                     y_bar_crit[idx_s4][x_txt]/y_bar_cnt[idx_s4][x_txt]*100
-                ), fontsize=FONT_SIZE, va="center", ha="left")
+                ), fontsize=FONT_SIZE/2, va="center", ha="left")
         ax.tick_params(which="both", bottom=False, labelbottom=False)
         ax.tick_params(axis="y", labelsize=FONT_SIZE)
 
