@@ -8,7 +8,8 @@ bosses = [
     "Anub'Rekhan", "Grand Widow Faerlina", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Noth the Plaguebringer", "Heigan the Unclean", "Loatheb",
         "Instructor Razuvious", "Gothik the Harvester", "Sapphiron", "Kel'Thuzad", "Lady Blaumeux", "Thane Korth'azz", "Highlord Mograine", "Sir Zeliek",
         "Stalagg", "Feugen",
-        "Unrelenting Trainee", "Unrelenting Deathknight", "Unrelenting Rider", "Spectral Trainee", "Spectral Deathknight", "Spectral Rider"
+        "Unrelenting Trainee", "Unrelenting Deathknight", "Unrelenting Rider", "Spectral Trainee", "Spectral Deathknight", "Spectral Rider",
+        "Unstoppable Abomination", "Soldier of the Frozen Wastes", "Guardian of Icecrown", "Soul Weaver",
     # Zul'Gurub
     "High Priestess Jeklik", "High Priest Venoxis", "High Priestess Mar'li", "High Priest Thekal", "High Priestess Arlokk",
         "Hakkar", "Bloodlord Mandokir", "Jin'do the Hexxer", "Gahz'ranka", "Gri'lek",
@@ -51,7 +52,11 @@ bosses_translator = {
     "Unrelenting Rider": "Gothik the Harvester",
     "Spectral Trainee": "Gothik the Harvester",
     "Spectral Deathknight": "Gothik the Harvester",
-    "Spectral Rider": "Gothik the Harvester"
+    "Spectral Rider": "Gothik the Harvester",
+    "Unstoppable Abomination": "Kel'Thuzad",
+    "Soldier of the Frozen Wastes": "Kel'Thuzad",
+    "Guardian of Icecrown": "Kel'Thuzad",
+    "Soul Weaver": "Kel'Thuzad",
 }
 
 def CalcStuff(list_log, t_cd_section):

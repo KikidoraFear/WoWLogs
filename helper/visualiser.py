@@ -20,6 +20,29 @@ class_colours = {
     "HUNTER": "lawngreen"
 }
 
+# def GetPlayersSep(df, players): # separate players by damage/heal
+#     df_damage = df[df["kind"]=="DAMAGE"]
+#     df_heal = df[df["kind"]=="HEAL"]
+#     players_sep = {
+#         "DAMAGE": {},
+#         "HEAL": {}
+#     }
+#     for source in players:
+#         idx_damage = df_damage["source"]==source
+#         idx_heal = df_heal["source"]==source
+#         val_sum = df_damage[idx_damage]["value"].sum() + df_heal[idx_heal]["value"].sum()
+#         if (val_sum>0) and (df_damage[idx_damage]["value"].sum()/val_sum*100 > 10): # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
+#             players_sep["DAMAGE"][source] = {
+#                 "class": players[source]["class"],
+#                 "pet": players[source]["pet"]
+#             }
+#         if (val_sum>0) and (df_heal[idx_heal]["value"].sum()/val_sum*100 > 10): # if heal > x% of total values -> healer
+#             players_sep["HEAL"][source] = {
+#                 "class": players[source]["class"],
+#                 "pet": players[source]["pet"]
+#             }
+#     return players_sep
+
 def GetPlayersSep(df, players): # separate players by damage/heal
     df_damage = df[df["kind"]=="DAMAGE"]
     df_heal = df[df["kind"]=="HEAL"]
@@ -31,7 +54,7 @@ def GetPlayersSep(df, players): # separate players by damage/heal
         idx_damage = df_damage["source"]==source
         idx_heal = df_heal["source"]==source
         val_sum = df_damage[idx_damage]["value"].sum() + df_heal[idx_heal]["value"].sum()
-        if (val_sum>0) and (df_damage[idx_damage]["value"].sum()/val_sum*100 > 10): # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
+        if df_damage[idx_damage]["value"].sum() > 10: # if damage > x% of total values -> damage dealer (careful: Shadow Priest does healing and damage)
             players_sep["DAMAGE"][source] = {
                 "class": players[source]["class"],
                 "pet": players[source]["pet"]
