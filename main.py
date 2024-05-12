@@ -17,9 +17,7 @@ from helper.visualiser import *
 #       biggest hits, biggest hits taken, most deaths, most dodges/parries/resists/evades, \
 #       most interrupts, biggest eheal, highest eheal %
 
-print("Sort spell bar plot by class")
-
-folder = r"Logfiles/240505_Nax"
+folder = r"Logfiles/240512_Nax"
 t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 

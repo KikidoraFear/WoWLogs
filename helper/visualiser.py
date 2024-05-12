@@ -64,6 +64,9 @@ def GetPlayersSep(df, players): # separate players by damage/heal
                 "class": players[source]["class"],
                 "pet": players[source]["pet"]
             }
+    # sort by class (so barplot_spell is sorted by class)        
+    players_sep["DAMAGE"] = dict(sorted(players_sep["DAMAGE"].items(), key=lambda item: item[1]["class"]))
+    players_sep["HEAL"] = dict(sorted(players_sep["HEAL"].items(), key=lambda item: item[1]["class"]))
     return players_sep
 
 
