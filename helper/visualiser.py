@@ -11,7 +11,7 @@ FONT_SIZE = 6
 class_colours = {
     "WARRIOR": "peru",
     "PRIEST": "darkgrey",
-    "SHAMAN": "mediumblue",
+    "SHAMAN": "royalblue",#"mediumblue",
     "PALADIN": "lightpink",
     "DRUID": "orange",
     "WARLOCK": "mediumorchid",
@@ -282,6 +282,129 @@ def GenSectionPlots(pp, df, players_sep, section):
     plt.close()
     pp.savefig(fig)
 
+def GenDeathBarPlots(pp, df, players, section):
+    if section == "All":
+        dff = df
+    elif section == "Bosses":
+        dff = df[df["section"] != ""]
+    elif section == "Trash":
+        dff = df[(df["section"] == "") & (df["incombat"])]
+    else:
+        dff = df[df["section"] == section]
+    dff.reset_index(inplace=True)
+
+    px = 1/plt.rcParams['figure.dpi']  # pixel in inches
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: " + section + " (Deaths)")
+    ax = fig.subplots()
+
+    dict_deaths = {}
+    for idx_player, player in enumerate(players):
+        idxs_deaths = dff[(dff["source"]==player) & (dff["subkind"]=="DIES")].index
+        for idx_death in idxs_deaths:
+            timestamp_death = dff.loc[idx_death, "timestamp"]
+            idx_ext = idx_death
+            while (dff.loc[idx_ext, "timestamp"] < timestamp_death + 1) & (idx_ext < len(dff)-1): # include events 1 second after death (sometimes death first, hit taken logged later)
+                idx_ext += 1
+            while idx_ext>=0: # find last 4 entries,
+                if (dff.loc[idx_ext, "timestamp"] < timestamp_death - 20): # maximum of x seconds in the past
+                    break
+                if (dff.loc[idx_ext, "target"] == player) & (dff.loc[idx_ext, "kind"] == "DAMAGE"):
+                    source = dff.loc[idx_ext, "source"]
+                    spell = dff.loc[idx_ext, "spell"]
+                    if not spell:
+                        spell = "Hit"
+                    if not source in dict_deaths:
+                        dict_deaths[source] = {}
+                    if not spell in dict_deaths[source]:
+                        dict_deaths[source][spell] = {}
+                    if not player in dict_deaths[source][spell]:
+                        dict_deaths[source][spell][player] = 1
+                    else:
+                        dict_deaths[source][spell][player] += 1
+                    break
+                idx_ext -= 1
+
+    bar_width = 0.25
+    bar_mult = 0
+    for source in dict_deaths:
+        for spell in dict_deaths[source]:
+            death_cause = "{}: {}".format(source, spell)
+            bar_mult_start = bar_mult
+            for player in dict_deaths[source][spell]:
+                death_counter = dict_deaths[source][spell][player]
+                class_col = class_colours[players[player]["class"]]
+                ax.barh(bar_width*bar_mult, death_counter, bar_width, color=class_col)
+                ax.text(0.1, bar_width*bar_mult, "{}: {:.0f}".format(player, death_counter), fontsize=FONT_SIZE, va="center", ha="left")
+                bar_mult += 1
+            bar_mult_end = bar_mult-1
+            ax.text(0, bar_width*(bar_mult_start+bar_mult_end)/2, death_cause, fontsize=FONT_SIZE, va="center", ha="right")
+            bar_mult += 1
+
+    ax.tick_params(which="both", left=False, labelleft=False)
+    ax.tick_params(axis="x", labelsize=FONT_SIZE)
+    plt.close()
+    pp.savefig(fig)
+
+def GenDeathTables(pp, df, players, section):
+    if section == "All":
+        dff = df
+    elif section == "Bosses":
+        dff = df[df["section"] != ""]
+    elif section == "Trash":
+        dff = df[(df["section"] == "") & (df["incombat"])]
+    else:
+        dff = df[df["section"] == section]
+    dff.reset_index(inplace=True)
+
+    px = 1/plt.rcParams['figure.dpi']  # pixel in inches
+    fig = plt.figure(figsize=(1920*px,1080*px))
+    fig.suptitle("Section: " + section)
+
+    players_amount = len(players)
+    rows = math.ceil(math.sqrt(players_amount))
+    cols = math.ceil(players_amount/rows)
+    gs = fig.add_gridspec(rows,cols)
+
+    for idx_player, player in enumerate(players):
+        row = math.floor(idx_player/cols)
+        col = idx_player%cols
+        ax = fig.add_subplot(gs[row, col])
+        class_col = class_colours[players[player]["class"]]
+        ax.set_title(player, color=class_col)
+        ax.axis("off")
+        ax.axis("tight")
+        
+        idxs_deaths = dff[(dff["source"]==player) & (dff["subkind"]=="DIES")].index
+        labels = np.array([])
+        timestamps = np.array([])
+        for idx_death in idxs_deaths:
+            timestamp_death = dff.loc[idx_death, "timestamp"]
+            labels = np.append(labels, "{:.2f}: {}".format(timestamp_death, dff.loc[idx_death, "line_mod"]))
+            timestamps = np.append(timestamps, timestamp_death)
+            idx_ext = idx_death
+            while (dff.loc[idx_ext, "timestamp"] < timestamp_death + 1) & (idx_ext < len(dff)-1): # include events 1 second after death (sometimes death first, hit taken logged later)
+                idx_ext += 1
+            ct_entries = 0
+            while (idx_ext>=0) & (ct_entries < 3): # find last 4 entries,
+                if (dff.loc[idx_ext, "timestamp"] < timestamp_death - 20): # maximum of x seconds in the past
+                    break
+                if (dff.loc[idx_ext, "target"] == player) & (dff.loc[idx_ext, "kind"] == "DAMAGE"):
+                    timestamps = np.append(timestamps, dff.loc[idx_ext, "timestamp"])
+                    labels = np.append(labels, "{:.2f}: {}".format(dff.loc[idx_ext, "timestamp"], dff.loc[idx_ext, "line_mod"]))
+                    ct_entries += 1
+                idx_ext -= 1
+        if np.size(idxs_deaths) > 0:
+            idx_s = np.argsort(timestamps)
+            tbl_entries = np.transpose(np.array([labels[idx_s]]))
+            tbl = ax.table(cellText = tbl_entries,
+                rowLoc="left",
+                loc="center"
+            )
+            for j in range(0,len(tbl_entries)):
+                tbl[(j,0)].set_height(.08)
+    pp.savefig(fig)
+
 def GenDeathPlots(pp, df, players, section):
     if section == "All":
         dff = df
@@ -378,6 +501,8 @@ def Visualise(df, players, folder):
     print("Plot Section: Trash")
     GenSectionPlots(pp, df, players_sep, "Trash")
     GenDeathPlots(pp, df, players, "Trash")   
+    # GenDeathTables(pp, df, players, "Trash")
+    GenDeathBarPlots(pp, df, players, "Trash")
 
     # SECTION: BOSS
     print("Plot Section: Boss")
@@ -387,6 +512,8 @@ def Visualise(df, players, folder):
             print("Section: " + section)
             GenSectionPlots(pp, df, players_sep, section)
             GenDeathPlots(pp, df, players, section)
+            # GenDeathTables(pp, df, players, section)
+            GenDeathBarPlots(pp, df, players, section)
     print()
 
     pp.close()

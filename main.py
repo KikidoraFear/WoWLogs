@@ -17,8 +17,8 @@ from helper.visualiser import *
 #       biggest hits, biggest hits taken, most deaths, most dodges/parries/resists/evades, \
 #       most interrupts, biggest eheal, highest eheal %
 
-folder = r"Logfiles/240512_Nax"
-t_delta_max = 1 # if the same entry is spotted from another source within this time interval, it's discarded
+folder = r"Logfiles/240518_MC"
+t_delta_max = 5 # if the same entry is spotted from another source within this time interval, it's discarded
 t_cd_section = 10 # Cooldown of section (last time boss appeared in combat log)
 
 ###################
