@@ -99,6 +99,7 @@ def LinePlot(ax, df, kind, section, players_sep):
             val_col = "eheal"
             idx = (dff["source"]==source)
         time = np.array(dff[idx]["timestamp"])
+        dff = dff.replace({None: np.nan})
         val = np.array(np.nancumsum(dff[idx][val_col])) #nancumsum since eheal sum can generate nan (if not logged by Kikilogs) -> treat as 0
         if np.size(time) > 0:
             ax.plot(time, val, color=line_color)

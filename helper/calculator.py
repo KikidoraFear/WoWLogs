@@ -21,7 +21,9 @@ bosses = [
     # ES
     "Erennius", "Solnius",
     # Onyxia
-    "Onyxia"
+    "Onyxia",
+    # Karazhan
+    "Brood Queen Araxxna", "Grizikil", "Clawlord Howlfang", "Lord Blackwald II", "Moroes"
 ]
 
 bosses_translator = {
