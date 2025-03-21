@@ -3,7 +3,7 @@ bosses = [
     "Arygos", "Battleguard Sartura", "C'Thun", "Emperor Vek'lor", "Emperor Vek'nilash", "Eye of C'Thun", "Fankriss the Unyielding", 
         "Merithra of the Dream", "Ouro", "Princess Huhuran", "The Master's Eye", "The Prophet Skeram", "Viscidus",
         "Lord Kri", "Princess Yauj", "Vem",
-        "Sartura's Royal Guard"
+        "Sartura's Royal Guard",
     # Naxxramas
     "Anub'Rekhan", "Grand Widow Faerlina", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Noth the Plaguebringer", "Heigan the Unclean", "Loatheb",
         "Instructor Razuvious", "Gothik the Harvester", "Sapphiron", "Kel'Thuzad", "Lady Blaumeux", "Thane Korth'azz", "Highlord Mograine", "Sir Zeliek",
