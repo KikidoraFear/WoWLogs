@@ -23,7 +23,9 @@ bosses = [
     # Onyxia
     "Onyxia",
     # Karazhan
-    "Brood Queen Araxxna", "Grizikil", "Clawlord Howlfang", "Lord Blackwald II", "Moroes"
+    "Brood Queen Araxxna", "Grizikil", "Clawlord Howlfang", "Lord Blackwald II", "Moroes",
+    # Tower of Karazhan
+    "Keeper Gnarlmoon"
 ]
 
 bosses_translator = {
