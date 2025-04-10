@@ -25,7 +25,7 @@ bosses = [
     # Karazhan
     "Brood Queen Araxxna", "Grizikil", "Clawlord Howlfang", "Lord Blackwald II", "Moroes",
     # Tower of Karazhan
-    "Keeper Gnarlmoon", "Ley-Watcher Incantagos"
+    "Keeper Gnarlmoon", "Ley-Watcher Incantagos", "Anomalus"
 ]
 
 bosses_translator = {
